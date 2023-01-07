@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50">
+<defs><radialGradient id="c" cx="25.321" cy="56.23" r="25.163" fx="25.321" fy="56.23" gradientTransform="matrix(1.07017 .00527 -.01591 2.08564 -1.739 -67.667)" gradientUnits="userSpaceOnUse">
+	<stop offset="0" stop-color="#ccc"/>
+	<stop offset="1" stop-color="#252525"/>
+</radialGradient></defs>
+<path aria-label="Arrow pointing down" fill="url(#c)" stroke="#fff" stroke-width="1.352" d="M11.587.594v22.298l-10.77-.017 23.386 26.03L47.79 22.95l-11.031-.018V.594Z" transform="translate(.7 .082)"/>
+</svg>
