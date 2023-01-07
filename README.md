@@ -6,8 +6,6 @@ Made for a private web game, because everything else I found looked complicated 
 
 Every file will be added to the DOM as a 1x1 pixel with 0.01 opacity, all within a div the script creates for you, which is fixed to the bottom left of the viewport. Everything is technically always visible and therefore the browser should always load and cache it, but it should be imperceivable to any human. If anyone spots it, say it's a reference to CRAM dots, because it is ;D
 
----
-
 ## Basic usage
 All you have to do is pass two parameters to `YAPLload()`.
 
@@ -25,8 +23,6 @@ const assets = [
 These parameters will be combined to make a full path, like `"/assets/img/cool-img.webp"` and `"/assets/snd/wacky-sound.ogg"`.
 
 If you use this ANYWHERE besides your own machine, ***KEEP YOUR LIST AS SHORT AS POSSIBLE!*** It will request all files in parallel at once, and HTTP requests add up fast. Spritesheets recommended!
-
----
 
 ## Using functions
 
