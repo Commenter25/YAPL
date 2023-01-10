@@ -1,4 +1,4 @@
-/*! @license Yet Another PreLoader v1.0.0 | Copyright (c) 2023 Commenter25 | MIT License  */
+/*! @license Yet Another PreLoader v1.0.1 | Copyright (c) 2023 Commenter25 | MIT License  */
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt MIT License */
 /* jshint esversion: 6, browser: true, devel: true, strict: global */ "use strict";
 
@@ -35,7 +35,8 @@ try { return new Promise( (resolve)=> {
 
 	const tagLoader = document.createElement("div");
 	tagLoader.id = "yet-another-preloader";
-	tagLoader.style = "position: fixed; top: 99.9vh; left: 0; display: flex; opacity: 0.01";
+	tagLoader.style = "position: fixed; top: 99.9vh; left: 0; display: flex; opacity: 0.01; user-select: none; pointer-events: none";
+	tagLoader.setAttribute('aria-hidden', 'true');
 	document.body.prepend(tagLoader);
 
 	const increment = worked => {
@@ -50,19 +51,25 @@ try { return new Promise( (resolve)=> {
 	};
 
 	const loadTag =(tag, file)=> {
+		let done = false;
 		function good() {
+			if (done) return;
 			// console.log(`YAPL: ${file} loaded successfully!`);
 			tagLoader.appendChild(tag);
-			increment(true);
+			increment(true); done = true;
 		}
 		function bad() {
+			if (done) return;
 			console.error(`YAPL: ${file} couldn't load!`);
-			increment(false);
+			increment(false); done = true;
 		}
 	
 		tag.src = file;
+		tag.style.width = "1px"; tag.style.height = "1px";
+		tag.tabIndex = -1;
+		tag.setAttribute('aria-hidden', 'true');
+		tag.alt = "";
 		tag.controls = true;
-		tag.style = "width: 1px; height: 1px";
 		tag.addEventListener("load", good);
 		tag.addEventListener("canplay", good);
 		tag.addEventListener("error", bad);
