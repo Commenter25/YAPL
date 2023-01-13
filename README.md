@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD033 -->
-# <img src="logo.svg" style="display:inline; height:1em; position:relative; top: 4px"> YAPL - Yet Another PreLoader
+# <img src="logo.svg" alt="" style="display:inline; height:1em; position:relative; top: 4px"> YAPL - Yet Another PreLoader
 The simplest JavaScript preloader I could think of. Probably too simple.
 
 Made for a private web game, because everything else I found looked complicated and scary, so I just made my own thing because I'm insane. Released as I felt others might find it useful. Besides the rest of that game, this is my first JavaScript project, so it probably sucks. This requires ES6, but it's so basic I think it could be refactored for ES3. I won't, because if you want that, I think you're probably more insane than me.
