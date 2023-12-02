@@ -1,17 +1,15 @@
-/*! @license Yet Another PreLoader v1.0.1 | Copyright (c) 2023 Commenter25 | MIT License  */
+/*! @license Yet Another PreLoader v2.0.0 | Copyright (c) 2023 Commenter25 | MIT License */
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&dn=expat.txt MIT License */
-/* jshint esversion: 6, browser: true, devel: true, strict: global */ "use strict";
+"use strict";
 
-let YAPLloaded = 0, YAPLfailed = 0; 
+let YAPLloaded = 0, YAPLfailed = 0;
 
-/**
- * @param {string} filename - String ending with a file extension, like "cool-img.webp" or "wacky-sound.ogg"
- * @returns {string} Returns the file extension at the end of a string.
- * @author Tomalak // https://stackoverflow.com/a/680982
- */
-function getExtension(string) {
-	return /(?:\.([^.]+))?$/.exec(string)[1];
-}
+const YAPLtag = document.createElement("div");
+YAPLtag.id = "yet-another-preloader";
+YAPLtag.style = "position: fixed; top: 99.9vh; left: 0; display: flex; opacity: 0.01; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none; cursor: default;";
+YAPLtag.setAttribute("aria-hidden", "true");
+document.body.prepend(YAPLtag);
+
 
 /**
  * Adds a series of files to the DOM so the browser caches them
@@ -19,33 +17,33 @@ function getExtension(string) {
  * @param {array} files - Array of strings with file paths relative to folder param - If using in ANY non-localhost context, KEEP AS SHORT AS POSSIBLE!!!!
  * @param {function} whenDone - Optional - Runs when all files have been parsed
  * @param {function} whenIncr - Optional - Runs every time a file is parsed, useful for progress indication
- * @param {function} onFail - Optional - For the event of complete failure - Using the phrase "Something has gone horribly wrong!" somewhere is recommended
+ * @param {function} whenErr - Optional - Runs when a file is unable to load, return true to prevent running whenDone
+ * @param {function} totalFail - Optional - For the event of complete failure - Using the phrase "Something has gone horribly wrong!" somewhere is recommended
  * @returns {Promise} Promise resolving when all files have been parsed
  * @throws Returns false and logs an exception to console if not given an array
- */ 
-function YAPLload(location, files, whenDone = false, whenIncr = false, onFail = false) {
+ */
+function YAPLload( location, files, whenDone = false, whenIncr = false, whenFail = false, totalFail = false ) {
 try { return new Promise( (resolve)=> {
 	if (files === undefined || !Array.isArray(files)) {
 		throw "Was not given an array in the files parameter!";
 	}
 
+	YAPLloaded = 0; YAPLfailed = 0;
+	let shouldStop = false;
+
 	// always have folder end in a slash, unless blank, so it makes a file path
 	let folder = location;
-	if (folder !== "" && folder.slice(-1) !== "/") folder = folder + '/';
-
-	const tagLoader = document.createElement("div");
-	tagLoader.id = "yet-another-preloader";
-	tagLoader.style = "position: fixed; top: 99.9vh; left: 0; display: flex; opacity: 0.01; user-select: none; pointer-events: none";
-	tagLoader.setAttribute('aria-hidden', 'true');
-	document.body.prepend(tagLoader);
+	if (folder !== "" && folder.slice(-1) !== "/") folder += "/";
 
 	const increment = worked => {
-		worked ? YAPLloaded++ : YAPLfailed++; // jshint ignore:line
+		worked ? YAPLloaded++ : YAPLfailed++;
+
+		if (shouldStop) return;
 		if (whenIncr) whenIncr();
-		
+
 		if (YAPLloaded + YAPLfailed === files.length) {
-			console.log(`YAPL: Execution complete! ${YAPLloaded} successful, ${YAPLfailed} failed`);
-			if (whenDone) whenDone(); 
+			// console.log(`YAPL: Execution complete! ${YAPLloaded} successful, ${YAPLfailed} failed`);
+			if (whenDone) whenDone();
 			resolve();
 		}
 	};
@@ -54,25 +52,35 @@ try { return new Promise( (resolve)=> {
 		let done = false;
 		function good() {
 			if (done) return;
+			YAPLtag.appendChild(tag);
 			// console.log(`YAPL: ${file} loaded successfully!`);
-			tagLoader.appendChild(tag);
-			increment(true); done = true;
+			done = true; increment(true);
+			tag.removeEventListener("error", bad);
 		}
 		function bad() {
 			if (done) return;
+			if (whenFail) shouldStop = whenFail();
 			console.error(`YAPL: ${file} couldn't load!`);
-			increment(false); done = true;
+			done = true; increment(false);
 		}
-	
-		tag.src = file;
-		tag.style.width = "1px"; tag.style.height = "1px";
+
+
+		tag.style.width = "2px"; tag.style.height = "2px";
 		tag.tabIndex = -1;
-		tag.setAttribute('aria-hidden', 'true');
-		tag.alt = "";
-		tag.controls = true;
-		tag.addEventListener("load", good);
-		tag.addEventListener("canplay", good);
-		tag.addEventListener("error", bad);
+		tag.setAttribute("aria-hidden", "true");
+		tag.src = file;
+
+		tag.addEventListener("error", bad, {once: true});
+		switch (tag.tagName) {
+			case "AUDIO": case "VIDEO":
+				tag.addEventListener("canplay", good, {once: true});
+				break;
+			case "IMG":
+				tag.alt = "";
+				tag.addEventListener("load", good, {once: true});
+				break;
+		}
+
 		return true; // returns loadFile as true
 	};
 
@@ -81,7 +89,7 @@ try { return new Promise( (resolve)=> {
 		switch (type) {
 			// images
 			case "webp": case "png": case "gif":
-			case "jpg": case "jpeg": case "avif":
+			case "jpg": case "jpeg": case "avif": case "jxl":
 				tag = new Image();
 				return loadTag(tag, file);
 			// sounds
@@ -93,17 +101,22 @@ try { return new Promise( (resolve)=> {
 				tag = document.createElement("video");
 				return loadTag(tag, file);
 			default:
+				if (whenFail) shouldStop = whenFail();
 				console.error(`YAPL: ${file} is unrecognized file type ${type}!`);
 				return false;
 		}
 	};
 
-	for (let i of files) loadFile(folder + i, getExtension(i));
-	
-	console.log(`YAPL: Attempting to load all files...`);
-});} catch (e) {
-	console.error("YAPL: Execution failure! " + e);
-	if (onFail) onFail(); 
+	for (const file of files) {
+		const ext = (/(?:\.([^.]+))?$/u).exec(file)[1]; // credit for this horrid regex to https://stackoverflow.com/a/680982
+		const validFile = loadFile(folder + file, ext);
+		if (!validFile && shouldStop) break;
+	}
+
+	// console.log(`YAPL: Attempting to load files...`);
+});} catch (err) {
+	console.error(`YAPL: Execution failure! ${err}`);
+	if (totalFail) totalFail();
 	return false;
 }}
 
