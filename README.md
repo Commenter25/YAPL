@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD033 -->
 # <img src="logo.svg" alt="" style="display:inline; height:1em; position:relative; top: 4px"> YAPL - Yet Another PreLoader
-The simplest JavaScript preloader I could think of. Probably too simple.
+The simplest JavaScript preloader I could think of. Probably too simple. Actually, definitely too simple, you probably don't want to use this. But you can try!
 
-Made for [Crazy Chrimble Catastrophy](https://chrimble.commenter.cc/), because everything else I found looked complicated and scary, so I just made my own thing because I'm insane. Released as I felt others might find it useful. Besides the rest of that game, this is my first JavaScript project, so it probably sucks. This requires ES6, but it's so basic I think it could be refactored for ES3. I won't, because if you want that, I think you're probably more insane than me.
+Made for [Crazy Chrimble Catastrophy](https://chrimble.commenter.cc/), because everything else I found looked complicated and scary, so I just made my own thing because I'm insane. Released as I felt others might find it useful. Or interesting. Or something. Besides the rest of that game, this is my first JavaScript project, so it sucks. This requires ES6, but it's so basic I think it could be refactored for ES3. I won't, because if you want that, I think you're probably more insane than me.
 
 Every file will be added to the DOM as a 1x1 pixel with 0.01 opacity, all within a div the script creates for you, which is fixed to the bottom left of the viewport. Everything is technically always visible and therefore the browser should always load and cache it, but it should be imperceivable to any human. If anyone spots it, say it's a reference to CRAM dots, because it is ;D
 
